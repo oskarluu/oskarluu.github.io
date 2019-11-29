@@ -199,7 +199,6 @@ class Maze extends Phaser.Scene {
 
     create() {
         console.log('CREATE');
-        console.log(map);
         console.log("");
 
         this.add.image(400, 400, 'backgroundMaze');
@@ -214,7 +213,6 @@ class Maze extends Phaser.Scene {
 
         //Dynamic
         player = this.physics.add.sprite(spacingSprite, setPlayerPos(), 'dog').setScale(adjustPlayerScale);
-        //player.setCollideWorldBounds(true);
 
         //Collides and overlaps
         this.physics.add.collider(player, walls);

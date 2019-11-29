@@ -1,3 +1,7 @@
+let LevelSelector = this.scene.get('LevelSelector');
+let Maze = this.scene.get('Maze');
+let MazeHud = this.scene.get('MazeHud');
+
 let config = {
     type: Phaser.AUTO,
     width: 800,
