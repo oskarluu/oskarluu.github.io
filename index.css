@@ -1,0 +1,13 @@
+
+#myObject{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+
+}
+
+#body{
+    background-image:url(assets/Mockup_Splashsite-Startseite_Bild.jpg); 
+    background-size: cover;
+
+}
