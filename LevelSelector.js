@@ -3,7 +3,7 @@ let mapsNotLoaded = true;
 
 class LevelSelector extends Phaser.Scene {
     constructor() {
-        super({ key: 'LevelSelector', active: true});
+        super({ key: 'LevelSelector' });
     }
 
     preload() {
