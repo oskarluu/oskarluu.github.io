@@ -283,7 +283,7 @@ class Maze extends Phaser.Scene {
         }
 
         if (player.x > 800 || player.y < 0 || player.y > 800) {
-            let tmp = getCurrentExitXYExitXY();
+            let tmp = getCurrentExitXY();
             map[tmp[1]][tmp[0]] = 9;
             scoreCoinCounter = 0;
             sceneHud.scene.stop();
