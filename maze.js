@@ -272,11 +272,11 @@ class Maze extends Phaser.Scene {
             }
         }
 
-        if (!moveRight && cursors.right.isDown && allowPlayerToMove) {
+        if (!moveRight && allowPlayerToMove && (cursors.right.isDown || directionRight)) {
             player.toggleFlipX();
             moveRight = true;
             moveLeft = false;
-        } else if (!moveLeft && cursors.left.isDown && allowPlayerToMove) {
+        } else if (!moveLeft && allowPlayerToMove && (cursors.left.isDown || directionLeft)) {
             player.toggleFlipX();
             moveLeft = true;
             moveRight = false;
