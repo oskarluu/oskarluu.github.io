@@ -182,11 +182,6 @@ class Maze extends Phaser.Scene {
         moveRight = false;
         moveLeft = false;
 
-        leftKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
-        rightKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
-        upKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
-        downKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
-
         widthSprite = 800 / map.length;
         spacingSprite = 800 / (map.length * 2);
         switch (widthSprite) {
