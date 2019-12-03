@@ -35,23 +35,23 @@ class LevelSelector extends Phaser.Scene {
             setXY: { x: 200, y: 200 },
             gridAlign: { width: 3, height: 3, cellWidth: 250, cellHeight: 175, x: 162, y: 235 }
         });
-        let dummy = groupThumbLevels.getChildren();
-        for(let i= 0; i<dummy.length;i++) {
-            let tint = dummy[i].tintTopLeft;
-            dummy[i].on('pointerdown', function(pointer) {
-                dummy[i].setScale(.95);
-                dummy[i].tint = tint - 4000000;
+        let gameObjectButtonsList = groupThumbLevels.getChildren();
+        for(let i= 0; i<gameObjectButtonsList.length;i++) {
+            let tint = gameObjectButtonsList[i].tintTopLeft;
+            gameObjectButtonsList[i].on('pointerdown', function(pointer) {
+                gameObjectButtonsList[i].setScale(.95);
+                gameObjectButtonsList[i].tint = tint - 4000000;
             });
             this.input.on('pointerup', function(pointer) {
-                dummy[i].setScale(1.0);
-                dummy[i].tint = dummy[i].tint
+                gameObjectButtonsList[i].setScale(1.0);
+                gameObjectButtonsList[i].tint = gameObjectButtonsList[i].tint
             })
         }
-        this.input.setHitArea(dummy);
+        this.input.setHitArea(gameObjectButtonsList);
 
         this.input.on('gameobjectup', function (pointer, gameObject, event) {
-            for(let i = 0; i< dummy.length; i++) {
-                if(gameObject == dummy[i]) {
+            for(let i = 0; i< gameObjectButtonsList.length; i++) {
+                if(gameObject == gameObjectButtonsList[i]) {
                     this.scene.start('Maze', {map: allMaps[i]});
                     this.scene.launch('MazeHud');
                 }

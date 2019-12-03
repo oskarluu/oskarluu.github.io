@@ -27,10 +27,10 @@ let randomX;
 let randomY;
 let randomSite;
 
-//Dynamic exit methods, rewrite code cause it sucks
+//Dynamic exit methods
 function changeExit() {
-    exitXY = getExitXY();
     exitNotFound = true;
+    exitXY = getCurrentExitXY();
     randomX = Math.floor(Math.random() * (map.length - 1));
     randomY = Math.floor(Math.random() * (map.length - 1));
     randomSite = Math.floor(Math.random() * 3);
@@ -39,27 +39,27 @@ function changeExit() {
         switch (randomSite) {
             case 0:
                 if (map[1][randomX] == 1) {
-                    console.log('oben optionaler weg: ' + map[1][randomX]);
-                    switchExit(exitXY[0], exitXY[1], randomX, 0);
+                    switchExitPosition(exitXY[0], exitXY[1], randomX, 0);
                     refreshMap();
                     exitNotFound = false;
                 }
+                //nextExitPosition(randomX, map[1]);
                 break;
             case 1:
                 if (map[randomY][map.length - 2] == 1) {
-                    console.log('rechts optionaler weg: ' + map[randomY][map.length - 2]);
-                    switchExit(exitXY[0], exitXY[1], map.length - 1, randomY);
+                    switchExitPosition(exitXY[0], exitXY[1], map.length - 1, randomY);
                     refreshMap();
                     exitNotFound = false;
                 }
+                //nextExitPosition(map.length - 2, randomY);
                 break;
             case 2:
                 if (map[map.length - 2][randomX] == 1) {
-                    console.log('unten optionaler weg: ' + map[map.length - 2][randomX]);
-                    switchExit(exitXY[0], exitXY[1], randomX, map.length - 1);
+                    switchExitPosition(exitXY[0], exitXY[1], randomX, map.length - 1);
                     refreshMap();
                     exitNotFound = false;
                 }
+                //nextExitPosition(randomX, map.length - 2);
                 break;
             default:
                 break;
@@ -68,13 +68,23 @@ function changeExit() {
     }
 }
 
-function switchExit(x, y, sx, sy) {
+function nextExitPosition(x, y) {
+    if (map[y][x] == 1) {
+        switchExitPosition(exitXY[0], exitXY[1], randomX, 0);
+        refreshMap();
+        exitNotFound = false;
+    }
+}
+
+//Switch Exit function inside map array
+function switchExitPosition(x, y, sx, sy) {
     let tmp = map[y][x];
     map[y][x] = map[sy][sx];
     map[sy][sx] = tmp;
 }
 
-function setPlayerPos() {
+//Get the X and Y Coords for player
+function getPlayerPos() {
     for (let y = 0; y < map.length; y++) {
         if (map[y][0] == 1) {
             return ((y * widthSprite) + spacingSprite);
@@ -83,7 +93,7 @@ function setPlayerPos() {
 }
 
 //Get current exit coords
-function getExitXY() {
+function getCurrentExitXY() {
     for (let x = 0; x < map.length; x++) {
         if (map[0][x] == 9 || map[0][x] == 1) {
             return [x, 0];
@@ -98,11 +108,12 @@ function getExitXY() {
 //Checks if player collects coins, increment score counter, unlocks lock, adds spinning coins to hud
 function collectCoin(player, coin) {
     coin.disableBody(true, true);
-    let animatedCoin = sceneHud.add.sprite(150 + scoreCoinCounter * 32, 32, 'coins').setScale(0.5).play('coinAnimation');
+    //let animatedCoin = sceneHud.add.sprite(150 + scoreCoinCounter * 32, 32, 'coins').setScale(0.5).play('coinAnimation');
+    let animatedCoin = sceneHud.add.image(150 + scoreCoinCounter * 40, 32, 'coin').setScale(0.5);
     animatedCoin.depth = 100;
     scoreCoinCounter += 1;
     if (scoreCoinCounter == 3) {
-        let tmpXY = getExitXY();
+        let tmpXY = getCurrentExitXY();
         map[tmpXY[1]][tmpXY[0]] = 1;
         lock.getChildren().map(child => child.destroy());
         cameraGame.flash();
@@ -118,9 +129,9 @@ function refreshMap() {
     for (let x = 0; x < map.length; x++) {
         for (let y = 0; y < map[x].length; y++) {
             if (map[y][x] == 0) {
-                walls.create(x * widthSprite + spacingSprite, y * widthSprite + spacingSprite, 'tree').setScale(adjustScale).setSize(adjustSize,adjustSize,true).setOffset(adjustOffset,adjustOffset);
+                walls.create(x * widthSprite + spacingSprite, y * widthSprite + spacingSprite, 'tree').setScale(adjustScale).setSize(adjustSize, adjustSize, true).setOffset(adjustOffset, adjustOffset);
             } else if (map[y][x] == 9) {
-                lock.create(x * widthSprite + spacingSprite, y * widthSprite + spacingSprite, 'lock').setScale(adjustScale).setSize(adjustSize,adjustSize,true).setOffset(adjustOffset,adjustOffset);
+                lock.create(x * widthSprite + spacingSprite, y * widthSprite + spacingSprite, 'lock').setScale(adjustScale).setSize(adjustSize, adjustSize, true).setOffset(adjustOffset, adjustOffset);
             }
         }
     }
@@ -131,11 +142,11 @@ function creatMap() {
     for (let x = 0; x < map.length; x++) {
         for (let y = 0; y < map[x].length; y++) {
             if (map[y][x] == 0) {
-                walls.create(x * widthSprite + spacingSprite, y * widthSprite + spacingSprite, 'tree').setScale(adjustScale).setSize(adjustSize,adjustSize,true).setOffset(adjustOffset,adjustOffset);
+                walls.create(x * widthSprite + spacingSprite, y * widthSprite + spacingSprite, 'tree').setScale(adjustScale).setSize(adjustSize, adjustSize, true).setOffset(adjustOffset, adjustOffset);
             } else if (map[y][x] == 2) {
-                coins.create(x * widthSprite + spacingSprite, y * widthSprite + spacingSprite, 'coin').setScale(adjustScale).setSize(adjustSize,adjustSize,true).setOffset(adjustOffset,adjustOffset);
+                coins.create(x * widthSprite + spacingSprite, y * widthSprite + spacingSprite, 'coin').setScale(adjustScale).setSize(adjustSize, adjustSize, true).setOffset(adjustOffset, adjustOffset);
             } else if (map[y][x] == 9) {
-                lock.create(x * widthSprite + spacingSprite, y * widthSprite + spacingSprite, 'lock').setScale(adjustScale).setSize(adjustSize,adjustSize,true).setOffset(adjustOffset,adjustOffset);
+                lock.create(x * widthSprite + spacingSprite, y * widthSprite + spacingSprite, 'lock').setScale(adjustScale).setSize(adjustSize, adjustSize, true).setOffset(adjustOffset, adjustOffset);
             }
         }
     }
@@ -189,12 +200,12 @@ class Maze extends Phaser.Scene {
                 adjustScale = 1;
                 adjustOffset = 0;
                 adjustSize = 80;
-                adjustPlayerScale =0.9;
+                adjustPlayerScale = 0.9;
                 break;
             default:
                 break;
         }
-        setPlayerPos();
+        getPlayerPos();
     }
 
     create() {
@@ -212,7 +223,7 @@ class Maze extends Phaser.Scene {
         creatMap();
 
         //Dynamic
-        player = this.physics.add.sprite(spacingSprite, setPlayerPos(), 'dog').setScale(adjustPlayerScale);
+        player = this.physics.add.sprite(spacingSprite, getPlayerPos(), 'dog').setScale(adjustPlayerScale);
 
         //Collides and overlaps
         this.physics.add.collider(player, walls);
@@ -279,7 +290,7 @@ class Maze extends Phaser.Scene {
             this.scene.start('LevelSelector');
         }
 
-        if (player.x < 800/(2*map.length)){
+        if (player.x < 800 / (2 * map.length)) {
             player.setCollideWorldBounds(true);
         } else {
             player.setCollideWorldBounds(false);

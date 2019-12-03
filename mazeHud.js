@@ -23,11 +23,8 @@ class MazeHud extends Phaser.Scene {
     }
 
     create() {
-        graphics = this.add.graphics();
         scoreText = this.add.image(70, 30, 'scoreText');
-        console.log('Amounter of pointers: ' + this.input.manager.pointersTotal);
         this.input.addPointer(1);
-        console.log('Amounter of pointers: ' + this.input.manager.pointersTotal);
         //Touch control
         let leftA = this.add.image(100, 700, 'leftArrow').setInteractive();
         leftA.depth = 100;
@@ -73,18 +70,6 @@ class MazeHud extends Phaser.Scene {
     }
 
     update() {
-
-        if (this.input.pointer1.isDown || this.input.pointer2.isDown)
-        {
-            graphics.clear();
-        } else{
-        }
-
-        graphics.fillStyle(0xff0000, 1);
-        graphics.fillRect(this.input.pointer1.x, this.input.pointer1.y, 64, 64);
-    
-        graphics.fillStyle(0x00ff00, 1);
-        graphics.fillRect(this.input.pointer2.x, this.input.pointer2.y, 64, 64);
 
     }
 }
