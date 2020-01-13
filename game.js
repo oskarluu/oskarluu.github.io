@@ -6,14 +6,14 @@ let config = {
         default: 'arcade',
         arcade: {
             gravity: { y: 0 },
-            debug: false
+            debug: true
         }
     },
     scale: {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH
     },
-    scene: [LevelSelector, Maze, MazeHud]
+    scene: [Tutorial, LevelSelector, Maze, MazeHud]
 }
 
 let game = new Phaser.Game(config);

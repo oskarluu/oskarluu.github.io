@@ -8,6 +8,8 @@ class LevelSelector extends Phaser.Scene {
 
     preload() {
 
+        this.load.image('backArrow', 'assets/LevelSelector/arrow.png');
+
         for(let i= 1; i<10;i++) {
             this.load.image('thumbLevel' + i, 'assets/LevelSelector/thumbLevel'+i +'.png' );
         }
@@ -26,6 +28,8 @@ class LevelSelector extends Phaser.Scene {
             return a.length - b.length;
         });
         this.add.image(400, 400, 'backgroundLvlSelector');
+        let backArrow = this.add.image(100, 720, 'backArrow').setScale(0.5).setFlipX(true).setInteractive();
+        let backText = this.add.text(230, 720, 'Zurück', fontStyleContinueText).setOrigin(0.5).setInteractive();
 
         let groupThumbLevels = this.add.group();
         let arrayKeyThumb = ['thumbLevel1', 'thumbLevel2', 'thumbLevel3', 'thumbLevel4', 'thumbLevel5', 'thumbLevel6', 'thumbLevel7', 'thumbLevel8', 'thumbLevel9'];
@@ -45,7 +49,7 @@ class LevelSelector extends Phaser.Scene {
             this.input.on('pointerup', function(pointer) {
                 gameObjectButtonsList[i].setScale(1.0);
                 gameObjectButtonsList[i].tint = gameObjectButtonsList[i].tint
-            })
+            });
         }
         this.input.setHitArea(gameObjectButtonsList);
 
@@ -56,7 +60,9 @@ class LevelSelector extends Phaser.Scene {
                     this.scene.launch('MazeHud');
                 }
             }
-                
+            if(gameObject == backArrow || gameObject == backText){
+                this.scene.start('Tutorial');
+            }    
         }, this);
 
     }
@@ -87,5 +93,4 @@ function processData(rawData) {
         map.push(tmp);
     }
     allMaps.push(map);
-   
 }

@@ -1,4 +1,3 @@
-let scoreText;
 let directionLeft;
 let directionRight;
 let directionUp;
@@ -18,12 +17,11 @@ class MazeHud extends Phaser.Scene {
         this.load.image('rightArrow', 'assets/Maze/rightArrow.png');
         this.load.image('downArrow', 'assets/Maze/downArrow.png');
         this.load.image('leftArrow', 'assets/Maze/leftArrow.png');
-        this.load.image('scoreText', 'assets/Maze/scoreText.png');
         this.load.atlas('coins', 'assets/Maze/coins.png', 'assets/Maze/coins.json');
     }
 
     create() {
-        scoreText = this.add.image(70, 30, 'scoreText');
+        this.add.text(70, 30, 'Münzen:', fontStyleTutorialText).setOrigin(0.5);
         this.input.addPointer(1);
         //Touch control
         let leftA = this.add.image(100, 700, 'leftArrow').setInteractive();

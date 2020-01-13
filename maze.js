@@ -8,6 +8,7 @@ let widthSprite;
 let spacingSprite;
 let exitNotFound;
 let cameraGame;
+let mapCreated
 //HUD variable
 let scoreCoinCounter = 0;
 let sceneHud;
@@ -40,38 +41,27 @@ function changeExit() {
             case 0:
                 if (map[1][randomX] == 1) {
                     switchExitPosition(exitXY[0], exitXY[1], randomX, 0);
-                    refreshMap();
+                    creatMap();
                     exitNotFound = false;
                 }
-                //nextExitPosition(randomX, map[1]);
                 break;
             case 1:
                 if (map[randomY][map.length - 2] == 1) {
                     switchExitPosition(exitXY[0], exitXY[1], map.length - 1, randomY);
-                    refreshMap();
+                    creatMap();
                     exitNotFound = false;
                 }
-                //nextExitPosition(map.length - 2, randomY);
                 break;
             case 2:
                 if (map[map.length - 2][randomX] == 1) {
                     switchExitPosition(exitXY[0], exitXY[1], randomX, map.length - 1);
-                    refreshMap();
+                    creatMap();
                     exitNotFound = false;
                 }
-                //nextExitPosition(randomX, map.length - 2);
                 break;
             default:
                 break;
         }
-        exitNotFound = false;
-    }
-}
-
-function nextExitPosition(x, y) {
-    if (map[y][x] == 1) {
-        switchExitPosition(exitXY[0], exitXY[1], randomX, 0);
-        refreshMap();
         exitNotFound = false;
     }
 }
@@ -105,7 +95,7 @@ function getCurrentExitXY() {
     }
 }
 
-//Checks if player collects coins, increment score counter, unlocks lock, adds spinning coins to hud
+//Checks if player collects coins, increment score counter, unlocks lock, adds (spinning) coins to hud
 function collectCoin(player, coin) {
     coin.disableBody(true, true);
     //let animatedCoin = sceneHud.add.sprite(150 + scoreCoinCounter * 32, 32, 'coins').setScale(0.5).play('coinAnimation');
@@ -120,36 +110,22 @@ function collectCoin(player, coin) {
     }
 }
 
-//Refreshes walls and lock
-function refreshMap() {
-
-    lock.clear(true);
-    walls.clear(true);
-
-    for (let x = 0; x < map.length; x++) {
-        for (let y = 0; y < map[x].length; y++) {
-            if (map[y][x] == 0) {
-                walls.create(x * widthSprite + spacingSprite, y * widthSprite + spacingSprite, 'tree').setScale(adjustScale).setSize(adjustSize, adjustSize, true).setOffset(adjustOffset, adjustOffset);
-            } else if (map[y][x] == 9) {
-                lock.create(x * widthSprite + spacingSprite, y * widthSprite + spacingSprite, 'lock').setScale(adjustScale).setSize(adjustSize, adjustSize, true).setOffset(adjustOffset, adjustOffset);
-            }
-        }
-    }
-}
-
 //Create map elements
 function creatMap() {
+    lock.clear(true);
+    walls.clear(true);
     for (let x = 0; x < map.length; x++) {
         for (let y = 0; y < map[x].length; y++) {
             if (map[y][x] == 0) {
                 walls.create(x * widthSprite + spacingSprite, y * widthSprite + spacingSprite, 'tree').setScale(adjustScale).setSize(adjustSize, adjustSize, true).setOffset(adjustOffset, adjustOffset);
-            } else if (map[y][x] == 2) {
+            } else if (map[y][x] == 2 && !mapCreated) {
                 coins.create(x * widthSprite + spacingSprite, y * widthSprite + spacingSprite, 'coin').setScale(adjustScale).setSize(adjustSize, adjustSize, true).setOffset(adjustOffset, adjustOffset);
             } else if (map[y][x] == 9) {
                 lock.create(x * widthSprite + spacingSprite, y * widthSprite + spacingSprite, 'lock').setScale(adjustScale).setSize(adjustSize, adjustSize, true).setOffset(adjustOffset, adjustOffset);
             }
         }
     }
+    mapCreated = true;
 }
 
 class Maze extends Phaser.Scene {
@@ -158,16 +134,10 @@ class Maze extends Phaser.Scene {
     }
 
     init(data) {
-        console.log('INIT');
-        console.log("")
-
         map = data.map;
     }
 
     preload() {
-        console.log('PRELOAD');
-        console.log("");
-
         //World elements
         this.load.image('backgroundMaze', './assets/Maze/background.png');
         this.load.image('tree', './assets/Maze/tree.png');
@@ -177,10 +147,13 @@ class Maze extends Phaser.Scene {
         this.load.image('dog', './assets/Maze/dog.png');
 
         sceneHud = this.scene.get('MazeHud');
+        //elementCircleHitbox = new Phaser.Geom.Circle(40, 40, 40);
+
 
         exitNotFound = true;
         moveRight = false;
         moveLeft = false;
+        mapCreated = false;
 
         widthSprite = 800 / map.length;
         spacingSprite = 800 / (map.length * 2);
@@ -210,9 +183,6 @@ class Maze extends Phaser.Scene {
     }
 
     create() {
-        console.log('CREATE');
-        console.log("");
-
         this.add.image(400, 400, 'backgroundMaze');
         this.anims.create({ key: 'coinAnimation', frames: this.anims.generateFrameNames('coins'), repeat: -1 });
 
@@ -236,9 +206,12 @@ class Maze extends Phaser.Scene {
         cameraGame.flash();
         cameraGame.setBounds(0, 0, 800, 800);
 
+        //Minimap
+        this.cameras.add(320, -320, 800, 800).setZoom(0.15);
+
         allowPlayerToMove = false;
         this.time.addEvent({
-            delay: 2000,
+            delay: 3000,
             callback: function () {
                 cameraGame.flash();
                 cameraGame.setZoom(2);
@@ -272,7 +245,7 @@ class Maze extends Phaser.Scene {
                 player.setVelocityY(0);
             }
         }
-        
+
         if (!moveRight && allowPlayerToMove && (cursors.right.isDown || directionRight)) {
             player.toggleFlipX();
             moveRight = true;
