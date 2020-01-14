@@ -162,19 +162,19 @@ class Maze extends Phaser.Scene {
                 adjustScale = 0.5;
                 adjustOffset = 20;
                 adjustSize = 40;
-                adjustPlayerScale = 0.3;
+                adjustPlayerScale = adjustScale * 0.6;
                 break;
             case 50:
                 adjustScale = 0.625;
                 adjustOffset = (16);
                 adjustSize = 50;
-                adjustPlayerScale = 0.4;
+                adjustPlayerScale = adjustScale * 0.6;
                 break;
             case 80:
                 adjustScale = 1;
                 adjustOffset = 0;
                 adjustSize = 80;
-                adjustPlayerScale = 0.8;
+                adjustPlayerScale = adjustScale * 0.6;
                 break;
             default:
                 break;
