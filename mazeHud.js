@@ -17,25 +17,27 @@ class MazeHud extends Phaser.Scene {
         this.load.image('rightArrow', 'assets/Maze/rightArrow.png');
         this.load.image('downArrow', 'assets/Maze/downArrow.png');
         this.load.image('leftArrow', 'assets/Maze/leftArrow.png');
+        this.load.image('backArrowHud', 'assets/Maze/arrow.png');
         this.load.atlas('coins', 'assets/Maze/coins.png', 'assets/Maze/coins.json');
     }
 
     create() {
         this.add.text(70, 30, 'Münzen:', fontStyleTutorialText).setOrigin(0.5);
+        let backArrowHud = this.add.image(40, 80, 'backArrowHud').setScale(0.3).setFlipX(true).setInteractive();
         this.input.addPointer(1);
         //Touch control
         let leftA = this.add.image(100, 700, 'leftArrow').setInteractive();
         leftA.depth = 100;
-        leftA.alpha = 0.5;
+        leftA.alpha = 0.7;
         let rightA = this.add.image(300, 700, 'rightArrow').setInteractive();
         rightA.depth = 100;
-        rightA.alpha = 0.5;
+        rightA.alpha = 0.7;
         let  upA = this.add.image(500, 700, 'upArrow').setInteractive();
         upA.depth = 100;
-        upA.alpha = 0.5;
+        upA.alpha = 0.7;
         let downA = this.add.image(700, 700, 'downArrow').setInteractive();
         downA.depth = 100;
-        downA.alpha = 0.5;
+        downA.alpha = 0.7;
 
         rightA.on('pointerover', function(event){
             directionRight = true;
@@ -64,6 +66,13 @@ class MazeHud extends Phaser.Scene {
         downA.on('pointerout', function(event){
             directionDown = false;
         });
+
+        this.input.on('gameobjectup', function (pointer, gameObject, event) {
+            if (gameObject == backArrowHud) {
+                this.scene.start('LevelSelector');
+                this.scene.stop('Maze');
+            }
+        }, this);
         
     }
 
