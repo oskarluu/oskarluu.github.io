@@ -1,5 +1,6 @@
 //Map variable
 let map = [];
+let mapNumber;
 let walls;
 let player;
 let coins;
@@ -10,7 +11,10 @@ let exitNotFound;
 let cameraGame;
 let mapCreated
 //HUD variable
+let timer;
+let lifeCounter;
 let scoreCoinCounter = 0;
+let gameOverBackButton;
 let sceneHud;
 //Player variable
 let allowPlayerToMove;
@@ -27,42 +31,48 @@ let exitXY;
 let randomX;
 let randomY;
 let randomSite;
+let gameOver;
+let maze;
+let startTimer;
 
 //Dynamic exit methods
 function changeExit() {
-    exitNotFound = true;
-    exitXY = getCurrentExitXY();
-    randomX = Math.floor(Math.random() * (map.length - 1));
-    randomY = Math.floor(Math.random() * (map.length - 1));
-    randomSite = Math.floor(Math.random() * 3);
+    if(gameOver == false){
 
-    while (exitNotFound) {
-        switch (randomSite) {
-            case 0:
-                if (map[1][randomX] == 1) {
-                    switchExitPosition(exitXY[0], exitXY[1], randomX, 0);
-                    creatMap();
-                    exitNotFound = false;
-                }
-                break;
-            case 1:
-                if (map[randomY][map.length - 2] == 1) {
-                    switchExitPosition(exitXY[0], exitXY[1], map.length - 1, randomY);
-                    creatMap();
-                    exitNotFound = false;
-                }
-                break;
-            case 2:
-                if (map[map.length - 2][randomX] == 1) {
-                    switchExitPosition(exitXY[0], exitXY[1], randomX, map.length - 1);
-                    creatMap();
-                    exitNotFound = false;
-                }
-                break;
-            default:
-                break;
+        exitNotFound = true;
+        exitXY = getCurrentExitXY();
+        randomX = Math.floor(Math.random() * (map.length - 1));
+        randomY = Math.floor(Math.random() * (map.length - 1));
+        randomSite = Math.floor(Math.random() * 3);
+    
+        while (exitNotFound) {
+            switch (randomSite) {
+                case 0:
+                    if (map[1][randomX] == 1) {
+                        switchExitPosition(exitXY[0], exitXY[1], randomX, 0);
+                        creatMap();
+                        exitNotFound = false;
+                    }
+                    break;
+                case 1:
+                    if (map[randomY][map.length - 2] == 1) {
+                        switchExitPosition(exitXY[0], exitXY[1], map.length - 1, randomY);
+                        creatMap();
+                        exitNotFound = false;
+                    }
+                    break;
+                case 2:
+                    if (map[map.length - 2][randomX] == 1) {
+                        switchExitPosition(exitXY[0], exitXY[1], randomX, map.length - 1);
+                        creatMap();
+                        exitNotFound = false;
+                    }
+                    break;
+                default:
+                    break;
+            }
+            exitNotFound = false;
         }
-        exitNotFound = false;
     }
 }
 
@@ -98,9 +108,8 @@ function getCurrentExitXY() {
 //Checks if player collects coins, increment score counter, unlocks lock, adds (spinning) coins to hud
 function collectCoin(player, coin) {
     coin.disableBody(true, true);
-    //let animatedCoin = sceneHud.add.sprite(150 + scoreCoinCounter * 32, 32, 'coins').setScale(0.5).play('coinAnimation');
-    let animatedCoin = sceneHud.add.image(150 + scoreCoinCounter * 40, 32, 'coin').setScale(0.5);
-    animatedCoin.depth = 100;
+    let coinHud = sceneHud.add.image(150 + scoreCoinCounter * 40, 32, 'coin').setScale(0.5);
+    coinHud.depth = 10;
     scoreCoinCounter += 1;
     if (scoreCoinCounter == 3) {
         let tmpXY = getCurrentExitXY();
@@ -135,6 +144,7 @@ class Maze extends Phaser.Scene {
 
     init(data) {
         map = data.map;
+        mapNumber = data.mapNumber;
     }
 
     preload() {
@@ -146,14 +156,17 @@ class Maze extends Phaser.Scene {
         //Characters
         this.load.image('dog', './assets/Maze/dog.png');
 
-        sceneHud = this.scene.get('MazeHud');
-        //elementCircleHitbox = new Phaser.Geom.Circle(40, 40, 40);
+        this.load.image('gameOver', './assets/Maze/gameOver.png');
 
+        sceneHud = this.scene.get('MazeHud');
+        maze = this.scene.scene;
 
         exitNotFound = true;
         moveRight = false;
         moveLeft = false;
         mapCreated = false;
+        gameOver = false;
+        startTimer = false;
 
         widthSprite = 800 / map.length;
         spacingSprite = 800 / (map.length * 2);
@@ -180,11 +193,13 @@ class Maze extends Phaser.Scene {
                 break;
         }
         getPlayerPos();
+        setTimerCounter();
     }
 
     create() {
+        console.log(map);
+        console.log(mapNumber);
         this.add.image(400, 400, 'backgroundMaze');
-        this.anims.create({ key: 'coinAnimation', frames: this.anims.generateFrameNames('coins'), repeat: -1 });
 
         //Static
         walls = this.physics.add.staticGroup();
@@ -216,6 +231,8 @@ class Maze extends Phaser.Scene {
                 cameraGame.flash();
                 cameraGame.setZoom(2);
                 cameraGame.startFollow(player, true, 0.09, 0.09);
+                maze.scene.launch('MazeHud');
+                startTimer = true;
                 allowPlayerToMove = true;
             }
         });
@@ -225,8 +242,31 @@ class Maze extends Phaser.Scene {
             callback: changeExit,
             loop: true
         });
+        this.time.addEvent({
+            delay: 1000,
+            callback: function () {
+                if (timerCounter == 0 && gameOver == false) {
+                    allowPlayerToMove = false;
+                    sceneHud.add.image(400,400,'gameOver').setDepth(99);
+                    sceneHud.add.text(400, 330, 'Die Zeit ist leider abgelaufen!\nVersuche es noch einmal!', fontStyleTutorialText).setAlign('center').setOrigin(0.5).setDepth(99);
+                    sceneHud.add.image(350, 430, 'lordchaos').setScale(0.2).setDepth(99);
+                    gameOverBackButton = sceneHud.add.image(450,430, 'backArrowHud').setScale(0.3).setDepth(99).setInteractive();
+                    cameraGame.setZoom(1);
+                    cameraGame.flash();
+                    setTimerCounter();
+                    startTimer = false;
+                }
+            },
+            loop: true
+        });
 
         cursors = this.input.keyboard.createCursorKeys();
+
+        sceneHud.input.on('gameobjectup', function (pointer, gameObject, event) {
+            if (gameObject == gameOverBackButton) {
+                gameOver = true;
+            }
+        }, this);
     }
 
     update() {
@@ -260,6 +300,11 @@ class Maze extends Phaser.Scene {
             let tmp = getCurrentExitXY();
             map[tmp[1]][tmp[0]] = 9;
             scoreCoinCounter = 0;
+            sceneHud.scene.stop();
+            this.scene.start('LevelSelector', {currentLevel: mapNumber.charAt(mapNumber.length-1)});
+        }
+        
+        if(gameOver){
             sceneHud.scene.stop();
             this.scene.start('LevelSelector');
         }
