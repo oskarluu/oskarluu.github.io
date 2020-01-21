@@ -1,4 +1,4 @@
-//Map variable
+//Map variables
 let map = [];
 let mapNumber;
 let walls;
@@ -10,41 +10,50 @@ let spacingSprite;
 let exitNotFound;
 let cameraGame;
 let mapCreated
-//HUD variable
+
+//HUD variables
 let timer;
 let lifeCounter;
 let scoreCoinCounter = 0;
-let gameOverBackButton;
+let levelFinishedBackButton;
 let sceneHud;
-//Player variable
+
+//Player variables
 let allowPlayerToMove;
 let cursors;
 let moveRight;
 let moveLeft;
-//Adjust variable
+let movingSpeed;
+
+//Adjust and scale variables
 let adjustScale;
 let adjustOffset;
 let adjustSize
 let adjustPlayerScale;
-//Auxiliary variable
+
+//Auxiliary variables
 let exitXY;
 let randomX;
 let randomY;
 let randomSite;
-let gameOver;
 let maze;
 let startTimer;
+let levelFinished;
+let endText
 
-//Dynamic exit methods
+/**
+ * Search a new position and change the position of the exit.
+ * Possible spots: upper, right and lower edge
+ */
 function changeExit() {
-    if(gameOver == false){
+    if (levelFinished == false) {
 
         exitNotFound = true;
         exitXY = getCurrentExitXY();
         randomX = Math.floor(Math.random() * (map.length - 1));
         randomY = Math.floor(Math.random() * (map.length - 1));
         randomSite = Math.floor(Math.random() * 3);
-    
+
         while (exitNotFound) {
             switch (randomSite) {
                 case 0:
@@ -76,14 +85,25 @@ function changeExit() {
     }
 }
 
-//Switch Exit function inside map array
-function switchExitPosition(x, y, sx, sy) {
-    let tmp = map[y][x];
-    map[y][x] = map[sy][sx];
-    map[sy][sx] = tmp;
+/**
+ * Switches values within a 2D array
+ * 
+ * @param {integer} oldX - Old X coordinate of the exit
+ * @param {integer} oldY - Old Y coordinate of the exit
+ * @param {integer} newX - New X coordinate of the exit
+ * @param {integer} newY - New Y coordinate of the exit
+ */
+function switchExitPosition(oldX, oldY, newX, newY) {
+    let tmp = map[oldY][oldX];
+    map[oldY][oldX] = map[newY][newX];
+    map[newY][newX] = tmp;
 }
 
-//Get the X and Y Coords for player
+/**
+ * Get the start position of the player
+ * 
+ * @return {integer} Y coordinate of player
+ */
 function getPlayerPos() {
     for (let y = 0; y < map.length; y++) {
         if (map[y][0] == 1) {
@@ -92,7 +112,10 @@ function getPlayerPos() {
     }
 }
 
-//Get current exit coords
+/** Get current exit coordinates
+ * 
+ * @return {array|Integer[]} current exit coordinates
+ */
 function getCurrentExitXY() {
     for (let x = 0; x < map.length; x++) {
         if (map[0][x] == 9 || map[0][x] == 1) {
@@ -105,7 +128,14 @@ function getCurrentExitXY() {
     }
 }
 
-//Checks if player collects coins, increment score counter, unlocks lock, adds (spinning) coins to hud
+/**
+ * Checks if player collides with coins, then increment score counter and disable the collected coin.
+ * If 3 coins are collected then disable the lock
+ * 
+ * @param {Phaser.GameObjects.Gameobject} player - The player
+ * @param {Phaser.GameObjects.Gameobject} coin - The coin which collides with the player
+ *
+ */
 function collectCoin(player, coin) {
     coin.disableBody(true, true);
     let coinHud = sceneHud.add.image(150 + scoreCoinCounter * 40, 32, 'coin').setScale(0.5);
@@ -119,7 +149,12 @@ function collectCoin(player, coin) {
     }
 }
 
-//Create map elements
+/**
+ * Creates map based on 2D array
+ * 0 represents walls
+ * 2 represents coins
+ * 9 represents the lock
+ */
 function creatMap() {
     lock.clear(true);
     walls.clear(true);
@@ -153,23 +188,27 @@ class Maze extends Phaser.Scene {
         this.load.image('tree', './assets/Maze/tree.png');
         this.load.image('coin', './assets/Maze/coin.png');
         this.load.image('lock', './assets/Maze/lock.png');
+
         //Characters
         this.load.image('dog', './assets/Maze/dog.png');
 
-        this.load.image('gameOver', './assets/Maze/gameOver.png');
-
+        //Scenes
         sceneHud = this.scene.get('MazeHud');
         maze = this.scene.scene;
 
+        //Variables
         exitNotFound = true;
         moveRight = false;
         moveLeft = false;
         mapCreated = false;
-        gameOver = false;
         startTimer = false;
-
+        levelFinished = false;
+        movingSpeed = 250;
         widthSprite = 800 / map.length;
         spacingSprite = 800 / (map.length * 2);
+        scoreCoinCounter = 0;
+
+        //Scaling of elements based on the width of one sprite
         switch (widthSprite) {
             case 40:
                 adjustScale = 0.5;
@@ -179,7 +218,7 @@ class Maze extends Phaser.Scene {
                 break;
             case 50:
                 adjustScale = 0.625;
-                adjustOffset = (16);
+                adjustOffset = 16;
                 adjustSize = 50;
                 adjustPlayerScale = adjustScale * 0.6;
                 break;
@@ -192,24 +231,20 @@ class Maze extends Phaser.Scene {
             default:
                 break;
         }
-        getPlayerPos();
-        setTimerCounter();
     }
 
     create() {
-        console.log(map);
-        console.log(mapNumber);
         this.add.image(400, 400, 'backgroundMaze');
 
-        //Static
+        //Generate map
         walls = this.physics.add.staticGroup();
         coins = this.physics.add.staticGroup();
         lock = this.physics.add.staticGroup();
-        //Creates map based on 2-D-Array
         creatMap();
 
-        //Dynamic
+        //Set player
         player = this.physics.add.sprite(spacingSprite, getPlayerPos(), 'dog').setScale(adjustPlayerScale);
+        allowPlayerToMove = false;
 
         //Collides and overlaps
         this.physics.add.collider(player, walls);
@@ -224,7 +259,7 @@ class Maze extends Phaser.Scene {
         //Minimap
         this.cameras.add(320, -320, 800, 800).setZoom(0.15);
 
-        allowPlayerToMove = false;
+        //Game start delay
         this.time.addEvent({
             delay: 3000,
             callback: function () {
@@ -237,20 +272,34 @@ class Maze extends Phaser.Scene {
             }
         });
 
+        //Change exit timer
         this.time.addEvent({
             delay: 4000,
             callback: changeExit,
             loop: true
         });
+
+        //Checks if clock timer hits 0 or game is finished
         this.time.addEvent({
             delay: 1000,
             callback: function () {
-                if (timerCounter == 0 && gameOver == false) {
+                if (timerCounter == 0 && levelFinished == false || levelFinished == true && timerCounter != 30) {
                     allowPlayerToMove = false;
-                    sceneHud.add.image(400,400,'gameOver').setDepth(99);
-                    sceneHud.add.text(400, 330, 'Die Zeit ist leider abgelaufen!\nVersuche es noch einmal!', fontStyleTutorialText).setAlign('center').setOrigin(0.5).setDepth(99);
-                    sceneHud.add.image(350, 430, 'lordchaos').setScale(0.2).setDepth(99);
-                    gameOverBackButton = sceneHud.add.image(450,430, 'backArrowHud').setScale(0.3).setDepth(99).setInteractive();
+                    sceneHud.add.image(400, 400, 'gameOver').setDepth(99);
+                    if (levelFinished == true) {
+                        endText = 'Du hast das Level geschafft!\nAb zum nächsten Level!'
+                        sceneHud.add.image(350, 430, 'samVogel').setScale(0.1).setDepth(99);
+                    } else {
+                        sceneHud.add.image(350, 430, 'lordchaos').setScale(0.2).setDepth(99);
+                        endText = 'Die Zeit ist leider abgelaufen!\nVersuche es noch einmal!';
+                    }
+                    sceneHud.add.text(400, 330, endText, fontStyleTutorialText).setAlign('center').setOrigin(0.5).setDepth(99);
+                    levelFinishedBackButton = sceneHud.add.image(450, 430, 'backArrowHud').setScale(0.3).setDepth(99).setInteractive();
+                    
+                    levelFinishedBackButton.on('pointerdown', function(pointer){
+                        levelFinishedBackButton.setScale(0.25);
+                    });
+
                     cameraGame.setZoom(1);
                     cameraGame.flash();
                     setTimerCounter();
@@ -260,17 +309,16 @@ class Maze extends Phaser.Scene {
             loop: true
         });
 
-        cursors = this.input.keyboard.createCursorKeys();
+        this.input.on('pointerup', function(pointer){
+            levelFinishedBackButton.setScale(0.3);
+        });
 
-        sceneHud.input.on('gameobjectup', function (pointer, gameObject, event) {
-            if (gameObject == gameOverBackButton) {
-                gameOver = true;
-            }
-        }, this);
+        //keyboard controls
+        cursors = this.input.keyboard.createCursorKeys();
     }
 
     update() {
-        let movingSpeed = 250;
+        //Player movement
         if (allowPlayerToMove) {
             if (cursors.right.isDown || directionRight) {
                 player.setVelocityX(movingSpeed);
@@ -286,6 +334,7 @@ class Maze extends Phaser.Scene {
             }
         }
 
+        //Player image flip conditions
         if (!moveRight && allowPlayerToMove && (cursors.right.isDown || directionRight)) {
             player.toggleFlipX();
             moveRight = true;
@@ -296,19 +345,14 @@ class Maze extends Phaser.Scene {
             moveRight = false;
         }
 
+        //Winning conditions and 
         if (player.x > 800 || player.y < 0 || player.y > 800) {
             let tmp = getCurrentExitXY();
             map[tmp[1]][tmp[0]] = 9;
-            scoreCoinCounter = 0;
-            sceneHud.scene.stop();
-            this.scene.start('LevelSelector', {currentLevel: mapNumber.charAt(mapNumber.length-1)});
-        }
-        
-        if(gameOver){
-            sceneHud.scene.stop();
-            this.scene.start('LevelSelector');
+            levelFinished = true;
         }
 
+        //World bounderies
         if (player.x < 800 / (2 * map.length)) {
             player.setCollideWorldBounds(true);
         } else {
