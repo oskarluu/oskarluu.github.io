@@ -137,7 +137,6 @@ class LevelSelector extends Phaser.Scene {
 
         //Animation when selecting a level
         for (let i = 0; i < gameObjectButtonsList.length; i++) {
-            //let tint = gameObjectButtonsList[i].tintTopLeft;
             gameObjectButtonsList[i].on('pointerdown', function (pointer) {
                 gameObjectButtonsList[i].setScale(.95);
                 gameObjectButtonsList[i].setTint(0xAAAAAA);
@@ -159,7 +158,7 @@ class LevelSelector extends Phaser.Scene {
                 currentLevel -= 1;
             }
             activeMap[currentLevel] = 1;
-            for(let i = 0; i <= parseInt(currentLevel); i++){
+            for(let i = 0; i <= activeMap.length; i++){
                 if(activeMap[i] == 1){
                     gameObjectButtonsList[i].setInteractive();
                     gameGrayObjectButtonsList[i].setVisible(false);

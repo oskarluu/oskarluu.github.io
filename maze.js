@@ -235,7 +235,6 @@ class Maze extends Phaser.Scene {
     }
 
     create() {
-        console.log(widthSprite*1+widthSprite/2);
         this.add.image(400, 400, 'backgroundMaze');
 
         //Generate map
