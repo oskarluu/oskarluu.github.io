@@ -39,7 +39,8 @@ let randomSite;
 let maze;
 let startTimer;
 let levelFinished;
-let endText
+let endText;
+
 
 /**
  * Search a new position and change the position of the exit.
@@ -234,6 +235,7 @@ class Maze extends Phaser.Scene {
     }
 
     create() {
+        console.log(widthSprite*1+widthSprite/2);
         this.add.image(400, 400, 'backgroundMaze');
 
         //Generate map
@@ -257,12 +259,13 @@ class Maze extends Phaser.Scene {
         cameraGame.setBounds(0, 0, 800, 800);
 
         //Minimap
-        this.cameras.add(320, -320, 800, 800).setZoom(0.15);
+        //this.cameras.add(320, -320, 800, 800).setZoom(0.15);
 
         //Game start delay
         this.time.addEvent({
             delay: 3000,
             callback: function () {
+                maze.cameras.add(320, -320, 800, 800).setZoom(0.15);
                 cameraGame.flash();
                 cameraGame.setZoom(2);
                 cameraGame.startFollow(player, true, 0.09, 0.09);

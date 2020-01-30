@@ -18,6 +18,7 @@ let gameGrayObjectButtonsList;
 //Auxiliary variables
 let mapsNotLoaded = true;
 let currentLevel;
+let activeMap = [];
 
 /**
  * Gets the map data from a CSV file
@@ -83,6 +84,7 @@ class LevelSelector extends Phaser.Scene {
         if (mapsNotLoaded) {
             for (let i = 1; i < 10; i++) {
                 getMap('maps/map_' + i);
+                activeMap.push(0);
             }
             mapsNotLoaded = false;
         }
@@ -149,12 +151,19 @@ class LevelSelector extends Phaser.Scene {
         //Initial situation
         gameObjectButtonsList[0].setInteractive();
         gameGrayObjectButtonsList[0].setVisible(false);
+        activeMap[0] = 1;
 
         //Make all maps clickable until current map
         if(currentLevel != null){
+            if(currentLevel == 9){
+                currentLevel -= 1;
+            }
+            activeMap[currentLevel] = 1;
             for(let i = 0; i <= parseInt(currentLevel); i++){
-                gameObjectButtonsList[i].setInteractive();
-                gameGrayObjectButtonsList[i].setVisible(false);
+                if(activeMap[i] == 1){
+                    gameObjectButtonsList[i].setInteractive();
+                    gameGrayObjectButtonsList[i].setVisible(false);
+                } 
             }
         }
         
@@ -162,7 +171,7 @@ class LevelSelector extends Phaser.Scene {
         this.input.on('gameobjectup', function (pointer, gameObject, event) {
             for (let i = 0; i < gameObjectButtonsList.length; i++) {
                 if (gameObject == gameObjectButtonsList[i]) {
-                    this.scene.start('Maze', { map: allMaps[i], mapNumber: arrayKeyThumb[i] });
+                    this.scene.start('Maze', {map: allMaps[i], mapNumber: arrayKeyThumb[i] });
                 }
             }
             if (gameObject == backArrow || gameObject == backText) {

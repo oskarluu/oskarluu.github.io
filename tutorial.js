@@ -24,7 +24,7 @@ class Tutorial extends Phaser.Scene {
         this.load.image('backgroundTutorial', 'assets/Tutorial/background.png');
         this.load.image('continueArrow', 'assets/Tutorial/arrow.png');
 
-        tutorialText = 'Willkommen beim Labyrinth!\nSammel alle Münzen, denn dadurch öffnest du das Schloss!\nDann musst du nur noch das Labyrinth verlassen,\naber Achtung! Du hast nur wenige Sekunden\ndir das Labyrinth einzuprägen\nund das Schloss wechselt ständig die Position!'
+        tutorialText = 'Willkommen im Irrgarten!\nSammle zuerst alle Münzen, \ndenn dadurch öffnest du das Schloss!\n Aber kannst du auch in jedem Level den Ausgang finden?\n Denn du hast nur wenig Zeit dir das Labyrinth anzuschauen\n und der Ausgang wechselt ständig seine Position.\n \n Sei aufmerksam!'
         fontStyleContinueText = { fontFamily: 'AhkioW05-Light', fontSize: 64, stroke: '#000', strokeThickness: 10 };
         fontStyleTutorialText = { fontFamily: 'AhkioW05-Light', fontSize: 36, stroke: '#000', strokeThickness: 10 };
     }
