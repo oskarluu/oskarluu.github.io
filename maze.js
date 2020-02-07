@@ -306,6 +306,8 @@ class Maze extends Phaser.Scene {
                     cameraGame.flash();
                     setTimerCounter();
                     startTimer = false;
+                    let tmp = getCurrentExitXY();
+                    map[tmp[1]][tmp[0]] = 9;
                 }
             },
             loop: true
@@ -349,8 +351,6 @@ class Maze extends Phaser.Scene {
 
         //Winning conditions and 
         if (player.x > 800 || player.y < 0 || player.y > 800) {
-            let tmp = getCurrentExitXY();
-            map[tmp[1]][tmp[0]] = 9;
             levelFinished = true;
         }
 
